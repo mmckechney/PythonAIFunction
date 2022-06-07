@@ -1,0 +1,20 @@
+FROM mcr.microsoft.com/azure-functions/python:3.0-python3.9-appservice
+
+ENV AzureWebJobsScriptRoot=/home/site/wwwroot \
+AzureFunctionsJobHost__Logging__Console__IsEnabled=true
+
+COPY requirements.txt /
+RUN apt-get update -y
+RUN apt-get install poppler-utils -y
+RUN apt-get install libleptonica-dev -y 
+RUN apt-get install tesseract-ocr -y
+RUN apt-get install tesseract-ocr-eng -y
+RUN apt-get install tesseract-ocr-script-latn -y
+RUN pip install azure-functions
+RUN pip install azure-storage-blob
+RUN pip install azure-identity
+RUN pip install pytesseract
+RUN pip install pdf2image
+RUN pip install numpy
+RUN pip install --no-cache-dir -r /requirements.txt
+COPY . /home/site/wwwroot
