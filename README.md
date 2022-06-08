@@ -9,8 +9,8 @@ This repository is offered to demonstrate a set of resources that will allow you
 The solution leverages the following Azure services:
 
 - **Azure Blob Storage** with two containers
-  - `incoming` - storage for the raw multipage PDF documents
-  - `trimmed` - storage for the single page JPEG images 
+  - `rawfile` - storage for the raw multipage PDF documents
+  - `incoming` - storage for the single page JPEG images  (named `incoming` to match the expected source container in  [High Throughput Form Recognizer](https://github.com/mmckechney/HighThroughputFormRecognizer))
 - **Azure Service Bus** with two queues
   - `rawqueue` - identified the "raw" multipage PFD documents that need processing
   - `formqueue` - where a new queue message will be placed to hand off to the [High Throughput Form Recognizer](https://github.com/mmckechney/HighThroughputFormRecognizer) processing

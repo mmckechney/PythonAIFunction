@@ -52,7 +52,7 @@ az network vnet subnet create --resource-group $resourceGroupName --name $trimAp
 ###########################
 Write-Host "Creating Azure Container Registry" -ForegroundColor DarkCyan
 az acr create --name $registryName --resource-group $resourceGroupName --sku Standard -o table
-az acr update --name $registryName --resource-group $resourceGroupName --admin-enabled $true
+az acr update --name $registryName --resource-group $resourceGroupName --admin-enabled $true -o table
 
 
 $acrId = az acr show --name $registryName --resource-group $resourceGroupName -o tsv --query id
@@ -95,10 +95,9 @@ Write-Host "Creating Storage Local IP Network Rules" -ForegroundColor DarkCyan
 az storage account network-rule add  --account-name $formStorageAcct --ip-address $myPublicIp -o table
 
 Write-Host "Creating Storage Containers" -ForegroundColor DarkCyan
+az storage container create --name "rawfiles" --account-name $formStorageAcct --account-key $storageKey -o table
 az storage container create --name "incoming" --account-name $formStorageAcct --account-key $storageKey -o table
-az storage container create --name "processed" --account-name $formStorageAcct --account-key $storageKey -o table
-az storage container create --name "output" --account-name $formStorageAcct --account-key $storageKey -o table
-az storage container create --name "trimmed" --account-name $formStorageAcct --account-key $storageKey -o table
+
 
 ###########################
 ## Function storage account
@@ -111,7 +110,7 @@ $webAppStorageConn = az storage account show-connection-string --resource-group 
 ## Function App plan
 ###########################
 Write-Host "Creating Function App Plan" -ForegroundColor DarkCyan
-az functionapp plan create --name $funcAppPlanTrim --resource-group $resourceGroupName --sku EP1 --max-burst 4  --is-linux  -o table
+az functionapp plan create --name $funcAppPlanTrim --resource-group $resourceGroupName --sku EP1 --max-burst 10  --is-linux  -o table
 
 
 ########################################
@@ -137,13 +136,14 @@ Write-Host "Updating App Settings" -ForegroundColor DarkCyan
 $settings= @(
 """SERVICEBUS_CONNECTION=$($sbConnString)""",  
 """STORAGE_ACCT_URL=$($storageUrl)""",
-"""SOURCE_CONTAINER_NAME=incoming""",
-"""DESTINATION_CONTAINER_NAME=trimmed""",
+"""SOURCE_CONTAINER_NAME=rawfiles""",
+"""DESTINATION_CONTAINER_NAME=incoming""",
 """DESTINATION_QUEUE_NAME=$($formQueueName)""",
 """KEYWORDS_LIST=$($keywords)""",
 """AzureWebJobsStorage=$($webAppStorageConn)"""
 )
 
+Write-Host "Setting Container CD to use System Assigned Managed Identity" -ForegroundColor DarkCyan
 az functionapp config appsettings set --resource-group $resourceGroupName --name $funcPreProcessTrim --settings @settings -o table
 
 
