@@ -5,6 +5,8 @@
 azure-functions
 azure-storage-blob
 azure-identity
+azure-servicebus
 pytesseract
 pdf2image
 numpy
+azure-servicebus
