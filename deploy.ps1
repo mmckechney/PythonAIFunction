@@ -17,6 +17,7 @@ $vnet = "vnet-$appName-demo-$location"
 $subnet = "subn-$appName-demo-$location"
 $nsg =  "nsg-$appName-demo-$location"
 $funcsubnet = "subn-$appName-func-demo-$location"
+$trimAppsubnet = "subn-$appName-trim-demo-$location"
 $funcAppPlanTrim = "fcnplan-$appName-trim-demo-$location"
 $formQueueName = "formqueue"
 $rawDocQueue = "rawqueue"
@@ -43,6 +44,8 @@ az network vnet subnet update --name $subnet --resource-group $resourceGroupName
 Write-Host "Creating Function Subnet" -ForegroundColor DarkCyan
 az network vnet subnet create --resource-group $resourceGroupName --name $funcsubnet --vnet-name $vnet --address-prefixes 10.10.1.0/24 --network-security-group $nsg --delegations Microsoft.Web/serverFarms --service-endpoints Microsoft.Storage Microsoft.Web -o table
 
+Write-Host "Creating Function Subnet for Linux Plan" -ForegroundColor DarkCyan
+az network vnet subnet create --resource-group $resourceGroupName --name $trimAppsubnet --vnet-name $vnet --address-prefixes 10.10.2.0/24 --network-security-group $nsg --delegations Microsoft.Web/serverFarms --service-endpoints Microsoft.Storage Microsoft.Web -o table
 
 ###########################
 ## Azure Container Registry 
@@ -85,6 +88,7 @@ $storageUrl = az storage account show --resource-group $resourceGroupName --name
 
 Write-Host "Creating Storage VNET Network Rules" -ForegroundColor DarkCyan
 az storage account network-rule add  --account-name $formStorageAcct --vnet-name $vnet --subnet $funcsubnet -o table
+az storage account network-rule add  --account-name $formStorageAcct --vnet-name $vnet --subnet $trimAppsubnet -o table
 az storage account network-rule add  --account-name $formStorageAcct --vnet-name $vnet --subnet $subnet -o table
 
 Write-Host "Creating Storage Local IP Network Rules" -ForegroundColor DarkCyan
@@ -123,6 +127,10 @@ $funcPreProcessTrimId = az functionapp identity show --name $funcPreProcessTrim 
 Write-Host "Enabling Function App CD " -ForegroundColor DarkCyan
 az functionapp config set --resource-group $resourceGroupName --name $funcPreProcessTrim --generic-configurations "{\""acrUseManagedIdentityCreds\"":\""true\""}" -o table
 az functionapp deployment container config --resource-group $resourceGroupName --name $funcPreProcessTrim --enable-cd $true -o table
+
+Write-Host "Creating Form pre-Processing VNET integration" -ForegroundColor DarkCyan
+az functionapp vnet-integration add --name $funcPreProcessTrim --resource-group $resourceGroupName --vnet $vnet --subnet $trimAppsubnet -o table
+
 
 Write-Host "Updating App Settings" -ForegroundColor DarkCyan
 

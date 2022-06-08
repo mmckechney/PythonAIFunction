@@ -47,7 +47,7 @@ To try out the sample end-to-end process, you will need:
 2. Run the deployment command
 
     ``` PowerShell
-    .\deploy.ps1 -appName <less than 6 characters> -location <azure region> -myPublicIp <your public ip address>
+    .\deploy.ps1 -appName "<less than 6 characters>" -location "<azure region>" -myPublicIp "<your public ip address>"
 
     ```
 
