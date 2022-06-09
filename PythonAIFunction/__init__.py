@@ -117,7 +117,7 @@ def main(msg: func.ServiceBusMessage):
             else:
                 print("No matches of '"+ keyword +"' on page '"+ str(page_number) + "' of file '" + message_file_name + "'")
 
-            #Delete the temp jpeg file
+            #Delete the temp PDF file
             try:
                 if os.path.exists(filePath):
                     os.remove(filePath)
