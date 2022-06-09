@@ -105,9 +105,25 @@ def main(msg: func.ServiceBusMessage):
                 except Exception as e:
                     print("ERROR: Failed to send message for file'" + temp_file_name + "' to queue: " + e.message)
                 
+                #Delete the temp jpeg file
+                try:
+                    if os.path.exists('/home/'+temp_file_name):
+                        os.remove('/home/'+temp_file_name)
+                        print("Deleted temp file'" + temp_file_name + "' ")
+                except Exception as e:
+                    print("ERROR: Failed to delete local temp file'" + temp_file_name + "' " + e.message)
                 break
+
             else:
                 print("No matches of '"+ keyword +"' on page '"+ str(page_number) + "' of file '" + message_file_name + "'")
 
+            #Delete the temp jpeg file
+            try:
+                if os.path.exists(filePath):
+                    os.remove(filePath)
+                    print("Deleted original source file'" + filePath + "' ")
+            except Exception as e:
+                print("ERROR: Failed to delete original source file'" + filePath + "' " + e.message)
+            break
 
     print("TOTAL PROCESS TIME: " + str(time.process_time() - start))
